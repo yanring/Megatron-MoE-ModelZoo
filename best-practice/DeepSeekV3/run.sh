@@ -25,7 +25,7 @@ A2A_OVERLAP=1 PP=8 VPP=4 TP=2 EP=64 NNODES=128 GBS=8192 PR=fp8 bash sbatch_bench
     --pipeline-model-parallel-layout "Et|(tt|)*30mL"
 
 # B200 config with 256 GPUs
-PR=mxfp8 A2A_OVERLAP=1 TP=1 PP=8 EP=32 NNODES=32 GBS=2048 bash sbatch_benchmarking.sh --recompute-granularity selective --recompute-modules mla_up_proj mlp --pipeline-model-parallel-layout "Et*3|(tt|)*29|mL"
+PR=mxfp8 A2A_OVERLAP=1 TP=1 PP=8 EP=32 NNODES=32 GBS=2048 bash sbatch_benchmarking.sh --recompute-granularity selective --recompute-modules mla_up_proj mlp --pipeline-model-parallel-layout "Et|(tt|)*30mL""
 
 
 
