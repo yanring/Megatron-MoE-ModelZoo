@@ -53,3 +53,29 @@ export BINDPCIE_PATH=${PATH_TO_BINDPCIE}/bindpcie
     - Fused indices to multihot (for DeepEP): enabled when `--permute-fusion` is added
     - Pad routing map (for FP8 training) `--moe-router-padding-for-fp8`
 - Force balance (for benchmark only) `--moe-router-force-load-balancing`
+
+## Guide on GB200 GPUs (4096 sequence lengths)
+
+This section will provide detailed instructions and recommendations for running DeepSeek-V3 training on NVIDIA GB200 GPU clusters.
+
+This document introduces how we optimize DeepSeek-V3 pretraining performance on GB200 cluster [Optimizing DeepSeek-V3 Training Performance on NVIDIA GB200 NVL72](https://github.com/NVIDIA/Megatron-LM/blob/dev/docs/discussions/deepseek-v3-gb200-optimization/deepseek-v3-gb200-optimization.md).
+
+## Preparation
+
+### Environment
+Please refer to this [README](../../README.md) document to setup your cluster, build your container image, and convert the DeepSeek-V3 checkpoint.
+
+### Get `bindpcie` (Optional, Recommended)
+Using `bindpcie` can help reduce the CPU overhead, and it is recommended to install.
+```
+cd ${PATH_TO_BINDPCIE}
+wget https://raw.githubusercontent.com/NVIDIA/mlperf-common/refs/heads/main/client/bindpcie
+chmod +x bindpcie
+export BINDPCIE_PATH=${PATH_TO_BINDPCIE}/bindpcie
+```
+
+## Launch the Training Benchmark Script
+- Fill up the environment variables in the `run_gb200.sh`
+- In the repo root directory run `bash best-practice/DeepSeekV3/run_gb200.sh`
+
+To reproduce the performance, you can also refer to this [guide](https://github.com/yaox12/Megatron-LM/blob/dsv3_gb200_reproduce/docs/discussion/DeepSeek-V3-GB200-Reproduce-Guide.md).

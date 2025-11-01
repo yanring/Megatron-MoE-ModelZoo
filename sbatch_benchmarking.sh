@@ -73,6 +73,15 @@ if [[ ${OPTIMIZER_OFFLOAD} == 1 ]]; then
     TRAINING_PARAMS="${TRAINING_PARAMS} --optimizer-cpu-offload --overlap-cpu-optimizer-d2h-h2d"
 fi
 
+DISPATCHER=${DISPATCHER:-"deepep"}
+if [[ ${DISPATCHER} == "alltoall" ]]; then
+    TRAINING_PARAMS="${TRAINING_PARAMS} --moe-token-dispatcher-type alltoall"
+elif [[ ${DISPATCHER} == "deepep" ]]; then
+    TRAINING_PARAMS="${TRAINING_PARAMS} --moe-token-dispatcher-type flex --moe-flex-dispatcher-backend deepep"
+elif [[ ${DISPATCHER} == "hybridep" ]]; then
+    TRAINING_PARAMS="${TRAINING_PARAMS} --moe-token-dispatcher-type flex --moe-flex-dispatcher-backend hybridep --moe-hybridep-num-sms 32"
+fi
+
 # FP8 arguments
 if [[ ${PR} == "fp8" ]]; then
     TRAINING_PARAMS="${TRAINING_PARAMS} --fp8-recipe blockwise --fp8-format e4m3"
@@ -89,7 +98,7 @@ if [[ ${PR} == "mxfp8" ]]; then
         TRAINING_PARAMS="${TRAINING_PARAMS} --fp8-param-gather --reuse-grad-buf-for-mxfp8-param-ag" # Optimizer CPU offload does not support fp8 param gather now.
     fi
     TRAINING_PARAMS="${TRAINING_PARAMS} --use-precision-aware-optimizer --main-grads-dtype fp32 --main-params-dtype fp32 --exp-avg-dtype bf16 --exp-avg-sq-dtype bf16"
-    TRAINING_PARAMS="${TRAINING_PARAMS} --moe-router-padding-for-fp8"
+    TRAINING_PARAMS="${TRAINING_PARAMS} --moe-router-padding-for-quantization"
 fi
 
 # 1F1B overlapping arguments and environment variables
@@ -103,7 +112,6 @@ else
     export CUDA_DEVICE_MAX_CONNECTIONS=1
     export NVTE_FWD_LAYERNORM_SM_MARGIN=0
     export NVTE_BWD_LAYERNORM_SM_MARGIN=0
-    TRAINING_PARAMS="${TRAINING_PARAMS} --overlap-grad-reduce --overlap-param-gather"
 fi
 
 # Long context arguments
@@ -121,11 +129,13 @@ if [[ ${PROFILE} -eq 1 ]]; then
         --capture-range-end=stop \
         --cuda-graph-trace=node \
         -f true -x true \
-        -o ${NSYS_PATH}/${MODEL}-benchmarking-${DATETIME}"
+        -o ${NSYS_PATH}/${WANDB_EXP_NAME}"
     TRAINING_PARAMS="${TRAINING_PARAMS} --profile --profile-step-start 20 --profile-step-end 22 --profile-ranks 0 "
 else
     PROFILE_CMD=""
 fi
+
+export BINDPCIE_PATH=${BINDPCIE_PATH:-""}
 
 # Export training command
 export TRAINING_CMD="${PROFILE_CMD} ${BINDPCIE_PATH} python ${TRAINING_SCRIPT_PATH} ${TRAINING_PARAMS}"
@@ -140,15 +150,27 @@ mkdir -p ${SLURM_LOGS} || {
 # Generate timestamp for job name
 TIMESTAMP=$(date +'%y%m%d_%H%M%S')
 
+# Set SBATCH_ARG based on cluster type
+
+if [[ "${GB200_CLUSTER}" == "1" ]]; then
+    N_TASKS_PER_NODE=4
+    if [[ -n ${SEGMENT} ]]; then
+        SBATCH_ARG+=" --segment=${SEGMENT}"
+    fi
+    export NVLINK_DOMAIN_SIZE=72
+else
+    N_TASKS_PER_NODE=8
+fi
+
 # Submit SLURM job
 set +e
-sbatch <<EOF
+sbatch ${SBATCH_ARG} <<EOF
 #!/bin/bash
 
 #SBATCH --nodes=${NNODES}
 #SBATCH --account=${ACCOUNT}
 #SBATCH --partition=${PARTITION}
-#SBATCH --ntasks-per-node=8
+#SBATCH --ntasks-per-node=${N_TASKS_PER_NODE}
 #SBATCH --time=${RUN_TIME}
 #SBATCH --job-name=${ACCOUNT}-moe-${RUN_NAME}-${TIMESTAMP}
 #SBATCH --dependency=singleton
@@ -157,7 +179,7 @@ sbatch <<EOF
 
 srun \
     --mpi=pmix -l \
-    --ntasks-per-node=8 \
+    --no-container-mount-home \
     --container-image=${CONTAINER_IMAGE} \
     --container-mounts=${CONTAINER_MOUNTS} \
     --container-workdir=${MEGATRON_PATH} \

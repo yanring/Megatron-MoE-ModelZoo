@@ -8,9 +8,11 @@ ENV_VARS:
   NVTE_NORM_BWD_USE_CUDNN: 1
   PYTHONWARNINGS: ignore
   NCCL_DEBUG: VERSION
+  NCCL_GRAPH_REGISTER: 0
 
   # Best practices for DSV3:
   # best-practice/DeepSeekV3/run.sh
+  # best-practice/DeepSeekV3/run_gb200.sh
   
 
 
@@ -50,7 +52,7 @@ MODEL_ARGS:
   --seq-length: ${SEQ_LEN}
   --data-cache-path: ${WORKSPACE}/data_cache
   --tokenizer-type: HuggingFaceTokenizer
-  --tokenizer-model: deepseek-ai/DeepSeek-V3
+  --tokenizer-model: unsloth/DeepSeek-V3
   --data-path: ${DATA_PATH}
   --split: 99,1,0
   --no-mmap-bin-files: true
@@ -98,8 +100,6 @@ MODEL_ARGS:
   --moe-shared-expert-intermediate-size: 2048
   --moe-router-load-balancing-type: seq_aux_loss
   --moe-router-topk: 8
-  --moe-token-dispatcher-type: flex
-  --moe-enable-deepep: true
   --moe-grouped-gemm: true
   --moe-aux-loss-coeff: 1e-4
   --moe-router-group-topk: 4
@@ -127,8 +127,8 @@ MODEL_ARGS:
   # --overlap-moe-expert-parallel-comm: true
 
   # Add MTP args
-  --mtp-num-layers: 1
-  --mtp-loss-scaling-factor: 0.1
+  # --mtp-num-layers: 1
+  # --mtp-loss-scaling-factor: 0.1
 
   # Add validation args
   --eval-iters: 32
