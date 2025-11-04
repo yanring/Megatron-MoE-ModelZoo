@@ -79,4 +79,4 @@ export BINDPCIE_PATH=${PATH_TO_BINDPCIE}/bindpcie
 - In the repo root directory run `bash best-practice/DeepSeekV3/run_gb200.sh`
 
 ### Another Reproduce Guide
-To reproduce the performance, you can also refer to this [guide]([https://github.com/yaox12/Megatron-LM/blob/dsv3_gb200_reproduce/docs/discussion/DeepSeek-V3-GB200-Reproduce-Guide.md](https://github.com/NVIDIA/Megatron-LM/blob/dev/docs/discussions/deepseek-v3-gb200-optimization/deepseek-v3-gb200-reproduce-guide.md)).
+To reproduce the performance, you can also refer to this [guide](https://github.com/NVIDIA/Megatron-LM/blob/dev/docs/discussions/deepseek-v3-gb200-optimization/deepseek-v3-gb200-reproduce-guide.md).
