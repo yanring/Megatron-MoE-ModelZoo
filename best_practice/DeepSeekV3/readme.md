@@ -7,12 +7,12 @@ This document provides a step-by-step guide to reproducing the state-of-the-art 
 
 This section will provide detailed instructions and recommendations for running DeepSeek-V3 training on NVIDIA H100 GPU clusters. It will include hardware-specific configuration tips, performance tuning strategies, and best practices to maximize throughput and efficiency on H100-based clusters.
 
-## Preparation
+### Preparation
 
-### Environment
+#### Environment
 Please refer to this [README](../../README.md) document to setup your cluster, build your container image, and convert the DeepSeek-V3 checkpoint.
 
-### Get `bindpcie` (Optional, Recommended)
+#### Get `bindpcie` (Optional, Recommended)
 Using `bindpcie` can help reduce the CPU overhead, and it is recommended to install.
 ```
 cd ${PATH_TO_BINDPCIE}
@@ -21,11 +21,11 @@ chmod +x bindpcie
 export BINDPCIE_PATH=${PATH_TO_BINDPCIE}/bindpcie
 ```
 
-## Launch the Training Benchmark Script
+### Launch the Training Benchmark Script
 - Fill up the environment variables in the `run.sh`
 - In the repo root directory run `bash best-practice/DeepSeekV3/run.sh`
 
-## Key Configurations for DeepSeek-V3 Training Performance
+### Key Configurations for DeepSeek-V3 Training Performance
 - MoE related optimizations
     - `--moe-router-dtype fp32 --moe-permute-fusion --moe-grouped-gemm --moe-router-fusion`
 - Enable DeepEP
@@ -60,12 +60,12 @@ This section will provide detailed instructions and recommendations for running 
 
 This document introduces how we optimize DeepSeek-V3 pretraining performance on GB200 cluster [Optimizing DeepSeek-V3 Training Performance on NVIDIA GB200 NVL72](https://github.com/NVIDIA/Megatron-LM/blob/dev/docs/discussions/deepseek-v3-gb200-optimization/deepseek-v3-gb200-optimization.md).
 
-## Preparation
+### Preparation
 
-### Environment
+#### Environment
 Please refer to this [README](../../README.md) document to setup your cluster, build your container image, and convert the DeepSeek-V3 checkpoint.
 
-### Get `bindpcie` (Optional, Recommended)
+#### Get `bindpcie` (Optional, Recommended)
 Using `bindpcie` can help reduce the CPU overhead, and it is recommended to install.
 ```
 cd ${PATH_TO_BINDPCIE}
@@ -74,8 +74,9 @@ chmod +x bindpcie
 export BINDPCIE_PATH=${PATH_TO_BINDPCIE}/bindpcie
 ```
 
-## Launch the Training Benchmark Script
+### Launch the Training Benchmark Script
 - Fill up the environment variables in the `run_gb200.sh`
 - In the repo root directory run `bash best-practice/DeepSeekV3/run_gb200.sh`
 
-To reproduce the performance, you can also refer to this [guide](https://github.com/yaox12/Megatron-LM/blob/dsv3_gb200_reproduce/docs/discussion/DeepSeek-V3-GB200-Reproduce-Guide.md).
+### Another Reproduce Guide
+To reproduce the performance, you can also refer to this [guide](https://github.com/NVIDIA/Megatron-LM/blob/dev/docs/discussions/deepseek-v3-gb200-optimization/deepseek-v3-gb200-reproduce-guide.md).
