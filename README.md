@@ -3,7 +3,7 @@
 This guide provides detailed instructions, best practices, and optimized configurations for testing Mixtral, DeepSeek, and Qwen series models using the Megatron-Core framework to achieve optimal performance and reliability.
 
 ## Key Updates
-- [DeepSeek-V3 best practices in a single command](https://github.com/yanring/Megatron-MoE-ModelZoo/blob/main/best-practice/DeepSeekV3/run.sh)
+- [DeepSeek-V3 best practices in a single command](https://github.com/yanring/Megatron-MoE-ModelZoo/blob/main/best_practice/DeepSeekV3/run.sh)
   - Current includes H100, B200, and Long Context. GB200 config coming soon.
 
 ## Table of Contents
