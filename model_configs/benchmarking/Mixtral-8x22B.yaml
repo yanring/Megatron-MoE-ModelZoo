@@ -78,6 +78,7 @@ MODEL_ARGS:
   --moe-grouped-gemm: ${MOE_GROUPED_GEMM}
   --moe-aux-loss-coeff: 1e-2
   --moe-permute-fusion: true
+  --moe-router-fusion: true
 
   # Add validation args
   --eval-iters: 32
