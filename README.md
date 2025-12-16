@@ -1,6 +1,11 @@
 # Megatron MoE Model Zoo
 
-Training and benchmarking MoE models (Mixtral, DeepSeek, Qwen) with the Megatron-Core framework.
+Production-ready training recipes for state-of-the-art MoE models — **DeepSeek-V3**, **Qwen3**, and **Mixtral** — built on 🚀 [Megatron-Core DEV branch](https://github.com/NVIDIA/Megatron-LM/tree/dev).
+
+✅ Performance-tuned configs for **H100, B200, and GB200** clusters  
+✅ Model-specific best practices for training MoE models
+✅ One-command launch with sensible defaults  
+✅ Dry-run mode to validate arguments before submitting jobs
 
 ## Best Practices
 
@@ -55,7 +60,7 @@ MODEL=DeepSeek-V3 bash ./sbatch_benchmarking.sh
 With custom/overwritten parameters:
 
 ```bash
-MODEL=DeepSeek-V3 TP=2 PP=8 EP=64 VPP=1 PP_FIRST=8 PP_LAST=5 RUN_TIME=00:60:00 NNODES=64 \
+MODEL=DeepSeek-V3 TP=2 PP=8 EP=64 VPP=1 RUN_TIME=00:60:00 NNODES=64 \
   bash sbatch_benchmarking.sh --recompute-granularity selective --recompute-modules mla_up_proj layernorm
 ```
 
