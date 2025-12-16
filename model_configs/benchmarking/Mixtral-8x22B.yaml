@@ -77,7 +77,6 @@ MODEL_ARGS:
   --moe-router-topk: 2
   --moe-grouped-gemm: ${MOE_GROUPED_GEMM}
   --moe-aux-loss-coeff: 1e-2
-  --moe-token-dispatcher-type: ${MOE_TOKEN_DISPATCHER}
   --moe-permute-fusion: true
 
   # Add validation args
