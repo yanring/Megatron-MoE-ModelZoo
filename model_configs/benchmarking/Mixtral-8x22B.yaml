@@ -4,6 +4,7 @@ ENV_VARS:
   NVTE_ALLOW_NONDETERMINISTIC_ALGO: 1
   PYTORCH_CUDA_ALLOC_CONF: expandable_segments:True
   NCCL_NVLS_ENABLE: 0
+  NCCL_GRAPH_REGISTER: 0
 
 MODEL_ARGS:
   # Distributed args
@@ -16,7 +17,6 @@ MODEL_ARGS:
   --use-distributed-optimizer: true
   --overlap-grad-reduce: true
   --overlap-param-gather: true
-  --tp-comm-overlap: true
 
   # Training args
   --use-mcore-models: true
@@ -83,6 +83,7 @@ MODEL_ARGS:
   --moe-aux-loss-coeff: 1e-2
   --moe-permute-fusion: true
   --moe-router-fusion: true
+  --enable-experimental: true
 
   # Add validation args
   --eval-iters: 32

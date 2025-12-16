@@ -92,6 +92,10 @@ if [[ ${PR} == "fp8" ]]; then
     TRAINING_PARAMS="${TRAINING_PARAMS} --moe-router-padding-for-fp8"
 fi
 
+if [[ ${PR} == "bf16" ]]; then
+    TRAINING_PARAMS="${TRAINING_PARAMS} --tp-comm-overlap"
+fi
+
 if [[ ${PR} == "mxfp8" ]]; then
     TRAINING_PARAMS="${TRAINING_PARAMS} --fp8-recipe mxfp8 --fp8-format e4m3"
     if [[ ${OPTIMIZER_OFFLOAD} == 0 ]]; then
