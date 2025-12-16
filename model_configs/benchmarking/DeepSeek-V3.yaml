@@ -41,7 +41,7 @@ MODEL_ARGS:
   --no-save-optim: true
   --no-check-for-nan-in-loss-and-grad: true
   --cross-entropy-loss-fusion: true
-  --cross-entropy-fusion-impl: te
+  --cross-entropy-fusion-impl: native # te ce fusion is broken
   --manual-gc: true
   --manual-gc-interval: 10
 

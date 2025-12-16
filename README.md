@@ -105,6 +105,7 @@ For performance benchmarking, you can launch scripts either with `sbatch` via [`
         # --wandb-exp-name: wandb_experiment_name
         ```
     </details>
+-   Set `DRY_RUN=1` before running the script to preview the SLURM job and training command without actually submitting it to the cluster.
 
 ## Runner Configuration Setup
 

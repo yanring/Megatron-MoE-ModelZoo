@@ -27,6 +27,10 @@ MODEL_ARGS:
   --global-batch-size: ${GBS}
   --train-samples: 268554688
   --exit-duration-in-mins: 230
+  --cross-entropy-loss-fusion: true
+  --cross-entropy-fusion-impl: native
+  --manual-gc: true
+  --manual-gc-interval: 50
 
   # Transformer Engine args
   --transformer-impl: transformer_engine

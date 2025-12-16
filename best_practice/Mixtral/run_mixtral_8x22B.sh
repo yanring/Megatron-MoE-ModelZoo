@@ -22,8 +22,14 @@ export MOE_GROUPED_GEMM=true
 export RUN_TIME=00:30:00
 export COMMENT=baseline
 
-# Dropless training, stable performance should be around 455TFLOPS for H100.
+# Dropless training, stable performance should be around 445TFLOPS for H100.
 MODEL=Mixtral-8x22B DISPATCHER=alltoall bash ./sbatch_benchmarking.sh
+
+# Dropless training with forced balancing, performance should be around 455TFLOPS for H100.
+MODEL=Mixtral-8x22B DISPATCHER=alltoall bash ./sbatch_benchmarking.sh --moe-router-force-load-balancing
 
 # Token Drop training, perf should be around 470TFLOPS for H100.
 MODEL=Mixtral-8x22B DISPATCHER=alltoall bash ./sbatch_benchmarking.sh --moe-expert-capacity-factor 1.0 --moe-pad-expert-input-to-capacity
+
+# Use PR=fp8 to enable block-wise FP8 training, which should provide an additional ~5-10% performance gain.
+# Set `DRY_RUN=1` before running the script to preview the SLURM job and training command without actually submitting it to the cluster.
