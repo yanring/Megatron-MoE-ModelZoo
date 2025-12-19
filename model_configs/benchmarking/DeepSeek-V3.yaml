@@ -5,6 +5,7 @@ ENV_VARS:
   NCCL_NVLS_ENABLE: 0
   NVTE_FUSED_ATTN: 1
   NVTE_NORM_FWD_USE_CUDNN: 1
+  # Disable cudnn norm bwd with ep overlap: leads to nan in grad norm with multi-stream
   NVTE_NORM_BWD_USE_CUDNN: 1
   PYTHONWARNINGS: ignore
   NCCL_DEBUG: VERSION
