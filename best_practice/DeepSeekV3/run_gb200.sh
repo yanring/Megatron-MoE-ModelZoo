@@ -12,24 +12,31 @@ export BINDPCIE_PATH=${BINDPCIE_PATH:-""}
 
 # Training parameters
 export SEQ_LEN=4096
-export GBS=2048
-export MBS=1
-export TP=1
+export GBS=${GBS:-8192}
+export MBS=${MBS:-1}
+export TP=${TP:-1}
 export EP=${EP:-32}
 export PP=${PP:-8}
 export VPP=${VPP:-4}
-export NNODES=64
+export NNODES=${NNODES:-64}
 export MOE_GROUPED_GEMM=true
-export PRETRAIN=1
+export PRETRAIN=${PRETRAIN:-1}
 export SEGMENT=$((EP * TP / 4))
 export PR=mxfp8
 export DISPATCHER=${DISPATCHER:-"hybridep"}
 
-export RUN_TIME=00:30:00
+export NUM_OF_HYBRID_EP_RANKS_PER_NVLINK_DOMAIN=$((EP * TP))
+export USE_MNNVL=1
+export NUM_OF_STAGES_DISPATCH_API=10
+export NUM_OF_IN_FLIGHT_S2G_DISPATCH_API=8
 
-# 256 GB200 GPUs, w/o MTP, w/ force load balancing
+export RUN_TIME=${RUN_TIME:-"00:20:00"}
+
+# 256 GB200 GPUs, w/ MTP, w/ force load balancing
 bash sbatch_benchmarking.sh \
-  --recompute-granularity selective --recompute-modules moe_act mlp \
+  --recompute-granularity selective --recompute-modules mlp \
   --cuda-graph-impl transformer_engine --cuda-graph-scope attn moe_router moe_preprocess --te-rng-tracker --cuda-graph-warmup-steps 0 \
+  --pipeline-model-parallel-layout "Et*4|(tttt|)*14tmL" \
+  --mtp-num-layers 1 --mtp-loss-scaling-factor 0.1 \
+  --offload-optimizer-states \
   --moe-router-force-load-balancing \
-  --pipeline-model-parallel-layout "Et|(tt|)*30L" \
