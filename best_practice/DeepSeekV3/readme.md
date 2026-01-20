@@ -60,6 +60,8 @@ This section will provide detailed instructions and recommendations for running 
 
 This document introduces how we optimize DeepSeek-V3 pretraining performance on GB200 cluster [Optimizing DeepSeek-V3 Training Performance on NVIDIA GB200 NVL72](https://github.com/NVIDIA/Megatron-LM/blob/dev/docs/discussions/deepseek-v3-gb200-optimization/deepseek-v3-gb200-optimization.md).
 
+This document demonstrates the complete workflow for reproducing performance, but please refer to the modelzoo for specific software versions and MCore args settings, as this guide will not be updated frequently [A Guide to Reproduce DeepSeek-V3 Pre-training Performance on GB200](https://github.com/NVIDIA/Megatron-LM/blob/dev/docs/discussions/deepseek-v3-gb200-optimization/deepseek-v3-gb200-reproduce-guide.md).
+
 ### Preparation
 
 #### Environment
