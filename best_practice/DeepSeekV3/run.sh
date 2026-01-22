@@ -1,3 +1,4 @@
+# H100
 export CLUSTER=
 export CONTAINER_IMAGE=
 export MEGATRON_PATH=

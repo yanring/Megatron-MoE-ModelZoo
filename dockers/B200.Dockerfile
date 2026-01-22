@@ -1,44 +1,66 @@
-FROM nvcr.io/nvidia/pytorch:25.06-py3 as base
+FROM nvcr.io/nvidia/pytorch:25.12-py3 AS base
 
 # Build the image
-# nvidia-docker build -f B200.dockerfile --build-arg --rm --network host -t gitlab-master.nvidia.com/denliu/dockers:pytorch2506-TE2.8-deepep1.2.1-x86 .
-ENV SHELL /bin/bash
+# docker build --target deepep -f dockers/B200.dockerfile -t container_url --network host .
+ENV SHELL=/bin/bash
 
-RUN rm /opt/megatron-lm -rf
-RUN apt-get update
-RUN apt-get install -y sudo gdb pstack bash-builtins git zsh autojump tmux curl
-RUN pip install debugpy dm-tree torch_tb_profiler einops wandb
-RUN pip install sentencepiece tokenizers transformers torchvision ftfy modelcards datasets tqdm pydantic==2.2.1
-RUN pip install nvidia-pytriton py-spy yapf darker pytest-cov pytest_mock
-# envsubst used for model_params substitution
-RUN apt-get install -y gettext
+RUN rm /opt/megatron-lm -rf && \
+    apt-get update && \
+    apt-get install -y sudo gdb pstack bash-builtins git zsh autojump tmux curl gettext && \
+    wget https://github.com/mikefarah/yq/releases/download/v4.27.5/yq_linux_amd64 -O /usr/bin/yq && \
+    chmod +x /usr/bin/yq && \
+    unset PIP_CONSTRAINT && pip install debugpy dm-tree torch_tb_profiler einops wandb \
+    sentencepiece tokenizers transformers==4.57.1 torchvision ftfy modelcards datasets tqdm pydantic \
+    nvidia-pytriton py-spy yapf darker \
+    tiktoken flask-restful \
+    nltk wrapt pytest pytest_asyncio pytest-cov pytest_mock pytest-random-order \
+    black==24.4.2 isort==5.13.2 flake8==7.1.0 pylint==3.2.6 coverage mypy \
+    setuptools==69.5.1 nvidia-cutlass-dsl=4.3.5 apache-tvm-ffi torch-c-dlpack-ext
 
-# Install TE
-ARG COMMIT=734bcedd9d86e4be30ce44f1ef67af5f69f3670d
-ARG TE="git+https://github.com/NVIDIA/TransformerEngine.git@$COMMIT"
-RUN unset PIP_CONSTRAINT && NVTE_CUDA_ARCHS="90;100" NVTE_BUILD_THREADS_PER_JOB=8 NVTE_FRAMEWORK=pytorch pip install --no-cache-dir --no-build-isolation $TE
+# =========================
+# Install cudnn because the latest build contains optimizations for MLA attention
+# =========================
+RUN apt-get update && \
+    wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-keyring_1.1-1_all.deb && \
+    dpkg -i cuda-keyring_1.1-1_all.deb && \
+    apt-get update && \
+    apt-get -y install libcudnn9-cuda-13
 
-RUN rm -rf /root/.cache /tmp/*
+# =========================
+# Install latest TE
+# Use a specific commit instead of main to make it more stable.
+# =========================
+ARG COMMIT="99df881061ba6949081fdd8f00dccd0f617c6594"
+ARG TE="git+https://github.com/nvidia/TransformerEngine.git@${COMMIT}"
+RUN unset PIP_CONSTRAINT && \
+    NVTE_CUDA_ARCHS="100a;103a" NVTE_BUILD_THREADS_PER_JOB=8 NVTE_FRAMEWORK=pytorch pip install --no-build-isolation --no-cache-dir $TE
 
+
+# =========================
+# Option 2: Install DeepEP
+# =========================
+FROM base AS deepep
 ## the dependency of IBGDA
 RUN ln -s /usr/lib/x86_64-linux-gnu/libmlx5.so.1 /usr/lib/x86_64-linux-gnu/libmlx5.so
 
 ## Clone and build deepep and deepep-nvshmem
-WORKDIR /home/dpsk_a2a
-RUN git clone https://github.com/deepseek-ai/DeepEP.git ./deepep
-RUN cd ./deepep && git checkout v1.2.1 && cd /home/dpsk_a2a
-RUN wget https://developer.download.nvidia.com/compute/nvshmem/redist/libnvshmem/linux-x86_64/libnvshmem-linux-x86_64-3.3.9_cuda12-archive.tar.xz -O nvshmem_src.tar.xz
-RUN tar -xvf nvshmem_src.tar.xz && mv libnvshmem-linux-x86_64-3.3.9_cuda12-archive deepep-nvshmem
+ENV CPATH=${CUDA_HOME}/include/cccl:$CPATH
+WORKDIR /workspace/dpsk_a2a
+RUN git clone https://github.com/deepseek-ai/DeepEP.git ./deepep && \
+    cd ./deepep && git checkout v1.2.1 && cd /workspace/dpsk_a2a && \
+    wget https://developer.download.nvidia.com/compute/nvshmem/redist/libnvshmem/linux-x86_64/libnvshmem-linux-x86_64-3.4.5_cuda13-archive.tar.xz -O nvshmem_src.tar.xz && \
+    tar -xvf nvshmem_src.tar.xz && mv libnvshmem-linux-x86_64-3.4.5_cuda13-archive deepep-nvshmem
 
-ENV NVSHMEM_DIR=/home/dpsk_a2a/deepep-nvshmem/
+ENV NVSHMEM_DIR=/workspace/dpsk_a2a/deepep-nvshmem/
 ENV LD_LIBRARY_PATH=${NVSHMEM_DIR}/lib:$LD_LIBRARY_PATH
 ENV PATH=${NVSHMEM_DIR}/bin:$PATH
 
 ## Build deepep
-WORKDIR /home/dpsk_a2a/deepep
-ENV TORCH_CUDA_ARCH_LIST="10.0"
-RUN NVSHMEM_DIR=/home/dpsk_a2a/deepep-nvshmem python setup.py develop
-RUN NVSHMEM_DIR=/home/dpsk_a2a/deepep-nvshmem python setup.py install
+WORKDIR /workspace/dpsk_a2a/deepep
+RUN TORCH_CUDA_ARCH_LIST="10.0" NVSHMEM_DIR=/workspace/dpsk_a2a/deepep-nvshmem MAX_JOBS=8 pip install --no-build-isolation .
 
-## Change the workspace
-WORKDIR /home/
+# =========================
+# Clean up
+# =========================
+RUN rm -rf /root/.cache /tmp/* /var/lib/apt/lists/*
+WORKDIR /workspace/
