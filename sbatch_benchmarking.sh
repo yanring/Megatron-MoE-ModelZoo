@@ -10,7 +10,6 @@ export CLUSTER=${CLUSTER:-"template"}
 export MCORE_RELEASE_VERSION=${MCORE_RELEASE_VERSION:-"your_own_megatron_version"} # Version and release info
 export MEGATRON_PATH=${MEGATRON_PATH:-"your_own_megatron_path"} # Path to Megatron-LM
 export CONTAINER_IMAGE=${CONTAINER_IMAGE:-"your_own_container_image"} # Path to .sqsh or docker image url
-export WANDB_API_KEY=${WANDB_API_KEY:-"your_own_wandb_api_key"} # Wandb API key
 
 # Load common configurations
 source "${WORKSPACE}/runtime_configs/benchmarking/common.conf"
@@ -111,8 +110,8 @@ fi
 A2A_OVERLAP=${A2A_OVERLAP:-0}
 if [[ ${A2A_OVERLAP} == 1 ]]; then
     export CUDA_DEVICE_MAX_CONNECTIONS=32
-    export NVTE_FWD_LAYERNORM_SM_MARGIN=20
-    export NVTE_BWD_LAYERNORM_SM_MARGIN=20
+    export NVTE_FWD_LAYERNORM_SM_MARGIN=24
+    export NVTE_BWD_LAYERNORM_SM_MARGIN=24
     TRAINING_PARAMS="${TRAINING_PARAMS} --delay-wgrad-compute --overlap-moe-expert-parallel-comm"
 else
     export CUDA_DEVICE_MAX_CONNECTIONS=1
