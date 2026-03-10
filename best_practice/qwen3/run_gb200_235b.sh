@@ -35,6 +35,8 @@ export PR=${PR:-"bf16"}
 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True NCCL_GRAPH_REGISTER=0 DISPATCHER=hybridep SEGMENT=2 PR=bf16 A2A_OVERLAP=0 TP=1 PP=8 VPP=1 EP=8 NNODES=64 MBS=1 GBS=8192 bash ./sbatch_benchmarking.sh --moe-router-force-load-balancing --cuda-graph-impl transformer_engine --cuda-graph-scope attn moe_router moe_preprocess
 
 # GB200 config, MXFP8, 919 TFLOPS
-## This requires new feature: activation offloading, please check the PR status.
+## This requires new feature: activation offloading, please check the following PRs for usage:
+## MCore: https://github.com/NVIDIA/Megatron-LM/pull/3219
+## TransformerEngine: https://github.com/NVIDIA/TransformerEngine/pull/2716
 PR=mxfp8 MBS=3 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True NCCL_GRAPH_REGISTER=0 DISPATCHER=hybridep A2A_OVERLAP=1 TP=1 PP=4 VPP=6 EP=64 SEGMENT=16 NNODES=64 GBS=3072 bash ./sbatch_benchmarking.sh --recompute-granularity selective --recompute-modules moe_act layernorm --moe-router-force-load-balancing --cuda-graph-impl transformer_engine --cuda-graph-scope attn moe_router moe_preprocess --fine-grained-activation-offloading --offload-modules expert_fc1 moe_act --delay-offload-until-cuda-graph --use-separate-send-recv-groups
 
