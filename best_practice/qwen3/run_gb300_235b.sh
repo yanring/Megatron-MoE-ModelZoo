@@ -9,7 +9,6 @@ export CLUSTER=${CLUSTER:-}
 export BINDPCIE_PATH=${BINDPCIE_PATH:-}
 
 # GB env
-# export SEGMENT=${SEGMENT:-8} # Should be EP // 4
 export NVLINK_DOMAIN_SIZE=72
 ## HybridEP settings, automatically set if using latest HybridEP
 # export USE_MNNVL=1
@@ -31,8 +30,5 @@ export RUN_TIME=00:30:00
 export COMMENT=baseline
 export PR=${PR:-"mxfp8"}
 
-# GB300 config, MXFP8, 974 TFLOPS
-PR=mxfp8 MBS=2 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True NCCL_GRAPH_REGISTER=0 DISPATCHER=hybridep SEGMENT=8 A2A_OVERLAP=0 TP=1 PP=4 VPP=1 EP=32 NNODES=64 GBS=8192 bash ./sbatch_benchmarking.sh --moe-router-force-load-balancing --cuda-graph-impl transformer_engine --cuda-graph-scope attn moe_router moe_preprocess
-
-# GB300 config, MXFP8, 1150 TFLOPS, long context training
-PR=mxfp8 SEQ_LEN=131072 CP=4 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True NCCL_GRAPH_REGISTER=0 DISPATCHER=hybridep SEGMENT=8 A2A_OVERLAP=0 TP=4 PP=4 VPP=12 EP=32 NNODES=32 MBS=1 GBS=1024 bash ./sbatch_benchmarking.sh --recompute-granularity selective --recompute-modules moe_act layernorm --moe-router-force-load-balancing
+# GB300 config, MXFP8, 1055 TFLOPS
+PR=mxfp8 MBS=1 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True NCCL_GRAPH_REGISTER=0 DISPATCHER=hybridep SEGMENT=16 A2A_OVERLAP=1 TP=1 PP=1 VPP=1 EP=64 NNODES=16 GBS=8192 bash ./sbatch_benchmarking.sh --moe-router-force-load-balancing --cuda-graph-impl transformer_engine --cuda-graph-scope attn moe_router moe_preprocess

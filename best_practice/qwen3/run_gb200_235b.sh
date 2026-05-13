@@ -40,3 +40,5 @@ PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True NCCL_GRAPH_REGISTER=0 DISPATCHE
 ## TransformerEngine: https://github.com/NVIDIA/TransformerEngine/pull/2716
 PR=mxfp8 MBS=3 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True NCCL_GRAPH_REGISTER=0 DISPATCHER=hybridep A2A_OVERLAP=1 TP=1 PP=4 VPP=6 EP=64 SEGMENT=16 NNODES=64 GBS=3072 bash ./sbatch_benchmarking.sh --recompute-granularity selective --recompute-modules moe_act layernorm --moe-router-force-load-balancing --cuda-graph-impl transformer_engine --cuda-graph-scope attn moe_router moe_preprocess --fine-grained-activation-offloading --offload-modules expert_fc1 moe_act --delay-offload-until-cuda-graph --use-separate-send-recv-groups
 
+# GB200 config, MXFP8, 128k long context, 1150 TFLOPS
+PR=mxfp8 SEQ_LEN=131072 CP=4 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True NCCL_GRAPH_REGISTER=0 DISPATCHER=hybridep SEGMENT=8 A2A_OVERLAP=0 TP=4 PP=4 VPP=12 EP=32 NNODES=32 MBS=1 GBS=1024 bash ./sbatch_benchmarking.sh --recompute-granularity selective --recompute-modules moe_act layernorm --moe-router-force-load-balancing
