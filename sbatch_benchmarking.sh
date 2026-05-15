@@ -165,6 +165,7 @@ mkdir -p ${SLURM_LOGS} || {
 TIMESTAMP=$(date +'%y%m%d_%H%M%S')
 
 # Set SBATCH_ARG based on cluster type
+SBATCH_ARG=""
 export GB200_CLUSTER=${GB200_CLUSTER:-0}
 if [[ "${GB200_CLUSTER}" == "1" ]]; then
     N_TASKS_PER_NODE=4

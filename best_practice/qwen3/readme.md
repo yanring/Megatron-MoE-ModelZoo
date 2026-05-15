@@ -1,5 +1,7 @@
 ## Performance Results
 
+### H100
+
 Experiment Setup:
 - 256 H100 GPUS
 - NVLink 4th Generation
@@ -19,7 +21,7 @@ Experiment Setup:
 
 *Note: The performance of Qwen3-Next-80B-A3B is not well tuned. Acceleration is coming soon!*
 
-### Long Context
+#### Long Context
 
 Experiment Setup:
 - NVLink 4th Generation
@@ -45,3 +47,58 @@ Notes:
 
 * Selective recompute requires PR [!2125](https://github.com/NVIDIA/TransformerEngine/pull/2125) of TransformerEngine to fix a memory issue of sequence parallel. If you run OOM without this PR, please use `--recompute-granularity full --recompute-method uniform --recompute-num-layers 1` to enable full recompute.
 * Add `--moe-router-force-load-balancing` to test forced load balancing.
+
+---
+
+### GB200
+
+Experiment Setup:
+- Model: Qwen3-235B-A22B
+- Dispatcher: HybridEP
+- NVLink Domain Size: 72
+
+| GPU | SEQ_LEN | NNODES | Precision | TP | PP | VPP | CP | EP | MBS | GBS | TFLOPS | Notes |
+| --- | ------- | ------ | --------- | -- | -- | --- | -- | -- | --- | --- | ------ | ----- |
+| GB200 | 4096   | 64 | BF16  | 1 | 8 | 1  | 1 | 8  | 1 | 8192 | 750  | |
+| GB200 | 4096   | 64 | MXFP8 | 1 | 4 | 6  | 1 | 64 | 3 | 3072 | 919  | activation offloading required |
+| GB200 | 131072 | 32 | MXFP8 | 4 | 4 | 12 | 4 | 32 | 1 | 1024 | 1150 | long context |
+
+Command (BF16):
+
+```bash
+PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True NCCL_GRAPH_REGISTER=0 DISPATCHER=hybridep SEGMENT=2 PR=bf16 A2A_OVERLAP=0 TP=1 PP=8 VPP=1 EP=8 NNODES=64 MBS=1 GBS=8192 bash ./sbatch_benchmarking.sh --moe-router-force-load-balancing --cuda-graph-impl transformer_engine --cuda-graph-scope attn moe_router moe_preprocess
+```
+
+Command (MXFP8):
+
+```bash
+PR=mxfp8 MBS=3 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True NCCL_GRAPH_REGISTER=0 DISPATCHER=hybridep A2A_OVERLAP=1 TP=1 PP=4 VPP=6 EP=64 SEGMENT=16 NNODES=64 GBS=3072 bash ./sbatch_benchmarking.sh --recompute-granularity selective --recompute-modules moe_act layernorm --moe-router-force-load-balancing --cuda-graph-impl transformer_engine --cuda-graph-scope attn moe_router moe_preprocess --fine-grained-activation-offloading --offload-modules expert_fc1 moe_act --delay-offload-until-cuda-graph --use-separate-send-recv-groups
+```
+
+Command (MXFP8, 128k long context):
+
+```bash
+PR=mxfp8 SEQ_LEN=131072 CP=4 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True NCCL_GRAPH_REGISTER=0 DISPATCHER=hybridep SEGMENT=8 A2A_OVERLAP=0 TP=4 PP=4 VPP=12 EP=32 NNODES=32 MBS=1 GBS=1024 bash ./sbatch_benchmarking.sh --recompute-granularity selective --recompute-modules moe_act layernorm --moe-router-force-load-balancing
+```
+
+Notes:
+* MXFP8 config requires the activation offloading feature. Please check the PR status before using it.
+
+---
+
+### GB300
+
+Experiment Setup:
+- Model: Qwen3-235B-A22B
+- Dispatcher: HybridEP
+- NVLink Domain Size: 72
+
+| GPU | SEQ_LEN | NNODES | Precision | TP | PP | VPP | CP | EP | MBS | GBS | TFLOPS | Notes |
+| --- | ------- | ------ | --------- | -- | -- | --- | -- | -- | --- | --- | ------ | ----- |
+| GB300 | 4096 | 16 | MXFP8 | 1 | 1 | 1 | 1 | 64 | 1 | 8192 | 1055 | |
+
+Command:
+
+```bash
+PR=mxfp8 MBS=1 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True NCCL_GRAPH_REGISTER=0 DISPATCHER=hybridep SEGMENT=16 A2A_OVERLAP=1 TP=1 PP=1 VPP=1 EP=64 NNODES=16 GBS=8192 bash ./sbatch_benchmarking.sh --moe-router-force-load-balancing --cuda-graph-impl transformer_engine --cuda-graph-scope attn moe_router moe_preprocess
+```

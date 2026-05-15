@@ -13,9 +13,10 @@ ENV_VARS:
 
 MODEL_ARGS:
   # Distributed args
-  --distributed-timeout-minutes: 210
+  --distributed-timeout-minutes: 220
   --tensor-model-parallel-size: ${TP}
   --pipeline-model-parallel-size: ${PP}
+  --num-layers-per-virtual-pipeline-stage: ${LAYERS_PER_VP}
   --expert-model-parallel-size: ${EP}
   --context-parallel-size: ${CP}
   --expert-tensor-parallel-size: 1
@@ -71,7 +72,7 @@ MODEL_ARGS:
   --num-query-groups: 4
   --qk-layernorm: true
   --seq-length: ${SEQ_LEN}
-  --max-position-embeddings: 40960
+  --max-position-embeddings: ${SEQ_LEN}
   --make-vocab-size-divisible-by: 1187
 
   # Add regularization args
@@ -99,8 +100,6 @@ MODEL_ARGS:
   --moe-router-pre-softmax: false # Different from Qwen2-MoE
   --moe-grouped-gemm: ${MOE_GROUPED_GEMM}
   --moe-aux-loss-coeff: 1e-3
-  --moe-token-dispatcher-type: flex
-  --moe-enable-deepep: true
   --moe-permute-fusion: true
   --moe-router-fusion: true
   --moe-router-dtype: fp32
@@ -125,8 +124,8 @@ MODEL_ARGS:
   # Add logging args
   --log-timers-to-tensorboard: true
   --log-memory-to-tensorboard: true
-  --log-num-zeros-in-grad: true
-  --log-params-norm: true
+  # --log-num-zeros-in-grad: true
+  # --log-params-norm: true
   --log-validation-ppl-to-tensorboard: true
   --log-throughput: true
   --log-interval: 1
