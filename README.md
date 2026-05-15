@@ -13,9 +13,9 @@ Ready-to-run scripts with optimized configurations:
 
 | Model | Hardware | Scripts |
 |-------|----------|---------|
-| DeepSeek-V3 | H100, B200, GB200 | [`best_practice/DeepSeekV3/`](./best_practice/DeepSeekV3/) |
-| Qwen3 | H100 | [`best_practice/Qwen3/`](./best_practice/Qwen3/) |
-| Mixtral | H100 | [`best_practice/Mixtral/`](./best_practice/Mixtral/) |
+| DeepSeek-V3 | H100, B200, GB200 | [`best_practice/deepseek-v3/`](./best_practice/deepseek-v3/) |
+| Qwen3 | H100 | [`best_practice/qwen3/`](./best_practice/qwen3/) |
+| Mixtral | H100 | [`best_practice/mixtral/`](./best_practice/mixtral/) |
 
 See [`best_practice/`](./best_practice/) for detailed guides.
 
@@ -41,7 +41,7 @@ echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc && source ~/.bashrc
 
 ### Container
 
-Dockerfile: [`dockers/Dockerfile`](./dockers/Dockerfile) (also available: `B200.Dockerfile`, `GB200.Dockerfile`)
+Dockerfile: [`dockers/H100.Dockerfile`](./dockers/H100.Dockerfile) (also available: `B200.Dockerfile`, `GB200.Dockerfile`)
 
 ## Performance Benchmarking
 
@@ -115,7 +115,3 @@ MODEL=DeepSeek-V3 TP=1 PP=4 EP=64 VPP=1 PP_FIRST=16 PP_LAST=13 NNODES=32 LOAD_PA
 ```
 
 Storage: Legacy ~3.4T, Distributed ~1.4T
-
-## References
-
-- [Design Docs](./design_docs/) - Implementation details for MTP, VPP, EP overlapping, etc.
