@@ -14,7 +14,7 @@ Ready-to-run scripts with optimized configurations:
 | Model | Hardware | Scripts |
 |-------|----------|---------|
 | DeepSeek-V3 | H100, B200, GB200 | [`best_practice/deepseek-v3/`](./best_practice/deepseek-v3/) |
-| Qwen3 | H100 | [`best_practice/qwen3/`](./best_practice/qwen3/) |
+| Qwen3 | H100, GB200 | [`best_practice/qwen3/`](./best_practice/qwen3/) |
 | Mixtral | H100 | [`best_practice/mixtral/`](./best_practice/mixtral/) |
 
 See [`best_practice/`](./best_practice/) for detailed guides.
