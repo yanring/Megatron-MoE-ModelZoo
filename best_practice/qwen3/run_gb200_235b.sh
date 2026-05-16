@@ -3,12 +3,12 @@ export CONTAINER_IMAGE=${CONTAINER_IMAGE:-}
 export ACCOUNT=${ACCOUNT:-}
 export MEGATRON_PATH=${MEGATRON_PATH:-}
 export PARTITION=${PARTITION:-}
-export RUN_NAME=${RUN_NAME:-"${MODEL}-benchmarking"}
 export CONTAINER_MOUNTS=${CONTAINER_MOUNTS:-}
 export CLUSTER=${CLUSTER:-}
 export BINDPCIE_PATH=${BINDPCIE_PATH:-}
 
 # GB env
+export GB200_CLUSTER=1
 # export SEGMENT=${SEGMENT:-16} # Should be EP // 4
 export NVLINK_DOMAIN_SIZE=72
 ## HybridEP settings, automatically set if using latest HybridEP
@@ -17,6 +17,7 @@ export NVLINK_DOMAIN_SIZE=72
 
 # Model selection parameters
 export MODEL=${MODEL:-Qwen3-235B-A22B}
+export RUN_NAME=${RUN_NAME:-"${MODEL}-benchmarking"}
 export WANDB_PROJECT=${WANDB_PROJECT:-}
 export OUTPUT_PATH=${OUTPUT_PATH:-}
 

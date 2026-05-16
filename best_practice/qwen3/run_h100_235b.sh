@@ -3,12 +3,12 @@ export CONTAINER_IMAGE=${CONTAINER_IMAGE:-}
 export ACCOUNT=${ACCOUNT:-}
 export MEGATRON_PATH=${MEGATRON_PATH:-}
 export PARTITION=${PARTITION:-}
-export RUN_NAME=${RUN_NAME:-"${MODEL}-benchmarking"}
 export CONTAINER_MOUNTS=${CONTAINER_MOUNTS:-}
 export CLUSTER=${CLUSTER:-}
 
 # Model selection parameters
 export MODEL=${MODEL:-Qwen3-235B-A22B}
+export RUN_NAME=${RUN_NAME:-"${MODEL}-benchmarking"}
 export WANDB_PROJECT=${WANDB_PROJECT:-}
 export OUTPUT_PATH=${OUTPUT_PATH:-}
 
