@@ -41,5 +41,10 @@ PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True NCCL_GRAPH_REGISTER=0 DISPATCHE
 ## TransformerEngine: https://github.com/NVIDIA/TransformerEngine/pull/2716
 PR=mxfp8 MBS=3 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True NCCL_GRAPH_REGISTER=0 DISPATCHER=hybridep A2A_OVERLAP=1 TP=1 PP=4 VPP=6 EP=64 SEGMENT=16 NNODES=64 GBS=3072 bash ./sbatch_benchmarking.sh --recompute-granularity selective --recompute-modules moe_act layernorm --moe-router-force-load-balancing --cuda-graph-impl transformer_engine --cuda-graph-scope attn moe_router moe_preprocess --fine-grained-activation-offloading --offload-modules expert_fc1 moe_act --delay-offload-until-cuda-graph --use-separate-send-recv-groups
 
+# GB200 config, MXFP8 + paged_stash + full-iteration CUDA graph + HybridEP, 128 GPUs, ~1160 TFLOPS
+## Requires the fix from https://github.com/NVIDIA/Megatron-LM/pull/4226 (commit b169e131).
+## Image: TransformerEngine >= 2.16, nvidia-cudnn-frontend >= 1.23.0.
+PR=mxfp8 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True NCCL_GRAPH_REGISTER=0 DISPATCHER=hybridep A2A_OVERLAP=1 NVTE_CUTEDSL_FUSED_GROUPED_MLP=1 NVTE_NORM_FWD_USE_CUDNN=0 NVTE_NORM_BWD_USE_CUDNN=0 TP=1 PP=1 VPP=1 EP=64 SEGMENT=16 NNODES=32 MBS=1 GBS=8192 bash ./sbatch_benchmarking.sh --moe-router-force-load-balancing --moe-paged-stash --moe-expert-rank-capacity-factor 1.2 --moe-paged-stash-page-size 64 --moe-paged-stash-buffer-size-factor-cuda 1.0 --moe-paged-stash-buffer-size-factor-cpu 0.8 --use-transformer-engine-op-fuser --moe-pad-experts-for-cuda-graph-inference --moe-mlp-glu-interleave-size 32 --cuda-graph-impl local --cuda-graph-scope full_iteration --cuda-graph-warmup-steps 2 --no-check-for-nan-in-loss-and-grad --te-rng-tracker
+
 # GB200 config, MXFP8, 128k long context, 1150 TFLOPS
 PR=mxfp8 SEQ_LEN=131072 CP=4 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True NCCL_GRAPH_REGISTER=0 DISPATCHER=hybridep SEGMENT=8 A2A_OVERLAP=0 TP=4 PP=4 VPP=12 EP=32 NNODES=32 MBS=1 GBS=1024 bash ./sbatch_benchmarking.sh --recompute-granularity selective --recompute-modules moe_act layernorm --moe-router-force-load-balancing

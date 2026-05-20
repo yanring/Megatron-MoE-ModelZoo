@@ -1,7 +1,7 @@
 ENV_VARS:
   CUDA_DEVICE_MAX_CONNECTIONS: 1
   NVTE_ALLOW_NONDETERMINISTIC_ALGO: 1
-  PYTORCH_CUDA_ALLOC_CONF: expandable_segments:True
+  PYTORCH_CUDA_ALLOC_CONF: expandable_segments:True,graph_capture_record_stream_reuse:True
   NCCL_NVLS_ENABLE: 0
   TRITON_CACHE_DIR: /tmp/triton_cache_$SLURM_NODEID
   # !Used for 1F1B overlap
