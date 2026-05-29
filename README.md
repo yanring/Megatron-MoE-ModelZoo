@@ -2,7 +2,7 @@
 
 Production-ready training recipes for state-of-the-art MoE models — **DeepSeek-V3**, **Qwen3**, and **Mixtral** — built on 🚀 [Megatron-Core DEV branch](https://github.com/NVIDIA/Megatron-LM/tree/dev).
 
-✅ Performance-tuned configs for **H100, B200, and GB200** clusters  
+✅ Performance-tuned configs for **H100, B200, GB200, and GB300** clusters  
 ✅ Model-specific best practices for training MoE models
 ✅ One-command launch with sensible defaults  
 ✅ Dry-run mode to validate arguments before submitting jobs
@@ -13,8 +13,8 @@ Ready-to-run scripts with optimized configurations:
 
 | Model | Hardware | Scripts |
 |-------|----------|---------|
-| DeepSeek-V3 | H100, B200, GB200 | [`best_practice/deepseek-v3/`](./best_practice/deepseek-v3/) |
-| Qwen3 | H100, GB200 | [`best_practice/qwen3/`](./best_practice/qwen3/) |
+| DeepSeek-V3 | H100, B200, GB200, GB300 | [`best_practice/deepseek-v3/`](./best_practice/deepseek-v3/) |
+| Qwen3 | H100, GB200, GB300 | [`best_practice/qwen3/`](./best_practice/qwen3/) |
 | Mixtral | H100 | [`best_practice/mixtral/`](./best_practice/mixtral/) |
 
 See [`best_practice/`](./best_practice/) for detailed guides.
