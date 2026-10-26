@@ -30,9 +30,17 @@ else
     exit 1
 fi
 
+# Megatron-LM rejects --data-path together with --mock-data, so drop the
+# config's --data-path when --mock-data is passed on the command line.
+export MOCK_DATA=0
+if [[ " $* " == *" --mock-data "* ]]; then
+    MOCK_DATA=1
+fi
+
 # Extract training parameters to export
 TRAINING_PARAMS_FROM_CONFIG=$(yq '... comments="" | .MODEL_ARGS | to_entries | .[] | 
     select(.value != "false") | 
+    select(strenv(MOCK_DATA) == "0" or .key != "--data-path") | 
     with(select(.value == "true"); .value = "") | 
     [.key + " " + .value] | join("")' ${TRAINING_PARAMS_PATH} | tr '\n' ' ')
 TRAINING_PARAMS="${TRAINING_PARAMS} ${TRAINING_PARAMS_FROM_CONFIG}"
